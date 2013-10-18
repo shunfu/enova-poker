@@ -20,46 +20,52 @@ def poker(PLAYER_KEY):
         if turn_data["your_turn"]:
             card1 = data['hand'][0]
             card2 = data['hand'][1]
+            current_money = data['stack']
 
             #deal phase
             if data["betting_phase"] == "deal":
-                #if the ante is just normal ante then just pay ante
-                if data[]
-                #if the ante is higher and your hand sucks then fold
-                #if ante and your hand is good then pay/raise
-                if data["call_amount"] == :
-                    return_action = {'action_name':"call"}
 
-                #else fold
-                else:
-                    return_action{'action_name':"fold"}
+                bet_amount = data['call_amount']
+                
+                if bet_amount == 0:
+                    bet_amount == 20
+                elif bet_amount >= current_money :
+                    bet_amount = current_money
+
+                return_action{'action_name':"bet", 'amount': bet_amount}
 
             #flop phase
             if data["betting_phase"] == "flop":
-                #calcuate the probability of winning the turn
-                #if probability is greater than 50% then bet
+               bet_amount = data['call_amount']
+                
+                if bet_amount == 0:
+                    bet_amount == 20
+                elif bet_amount >= current_money :
+                    bet_amount = current_money
 
-                #else fold
-                else:
-                    return_action{'action_name':"fold"}
+                return_action{'action_name':"bet", 'amount': bet_amount}
             #turn phase
             if data["betting_phase"] == "turn":
-                #update the probability
-                #if it is still greater than 50% then continue
+               bet_amount = data['call_amount']
                 
-                #else fold
-                else:
-                    return_action{'action_name':"fold"}
+                if bet_amount == 0:
+                    bet_amount == 20
+                elif bet_amount >= current_money :
+                    bet_amount = current_money
+
+                return_action{'action_name':"bet", 'amount': bet_amount}
 
             #river phase
             if data["betting_phase"] == "river":
-                #update the final probabilty
-                #if the chance of winning is still greater than 50% then raise
-            
-            #else fold
-            else:
-                return_action{'action_name':"fold"}
+               bet_amount = data['call_amount']
+                
+                if bet_amount == 0:
+                    bet_amount == 20
+                elif bet_amount >= current_money :
+                    bet_amount = current_money
 
+                return_action{'action_name':"bet", 'amount': bet_amount}
+            
 """ 
         This is the provided sample dumb_bot code
         # Is it a betting round, but not the river? Let's always call.
@@ -79,7 +85,7 @@ def poker(PLAYER_KEY):
 """
     
         # POST a request to the server
-        response = player_action(PLAYER_KEY, my_action)
+        response = player_action(PLAYER_KEY, return_action)
 
 # GET
 def game_state(key):
