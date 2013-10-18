@@ -102,3 +102,10 @@ def player_action(key, json_params):
     # return json
     r = requests.post('http://nolimitcodeem.com/api/players/{}/action'.format(key))
     return r.json()
+
+def main():
+    # the key is generated when we register for the tournament
+    poker(60fd7cbe-f9e0-4ebe-a0e3-f554872a312f)
+
+if __name__ == '__main__':
+    main()
