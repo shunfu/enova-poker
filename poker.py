@@ -28,7 +28,6 @@ def poker(PLAYER_KEY):
 
             #deal phase
             if turn_data["betting_phase"] == "deal":
-
                 if prob_deal(card1, card2):
                     return_action = {'action_name': "call"}
                 else:
@@ -36,43 +35,26 @@ def poker(PLAYER_KEY):
 
             #flop phase
             if turn_data["betting_phase"] == "flop":
+                return_action = {'action_name': "call"}
 
-                bet_amount = turn_data['call_amount']
-                
-                if bet_amount == 0:
-                    bet_amount == 20
-                elif bet_amount >= current_money :
-                    bet_amount = current_money
-
-                return_action = {'action_name': "bet", 'amount': bet_amount}
             #turn phase
             if turn_data["betting_phase"] == "turn":
-                bet_amount = turn_data['call_amount']
-                
-                if bet_amount == 0:
-                    bet_amount == 20
-                elif bet_amount >= current_money :
-                    bet_amount = current_money
-
-                return_action = {'action_name':"bet", 'amount': bet_amount}
+                return_action = {'action_name': "call"}
 
             #river phase
             if turn_data["betting_phase"] == "river":
-                bet_amount = turn_data['call_amount']
-                
-                if bet_amount == 0:
-                    bet_amount == 20
-                elif bet_amount >= current_money :
-                    bet_amount = current_money
+                return_action = {'action_name': "call"}
 
-                return_action = {'action_name': "bet", 'amount': bet_amount}
+            #showdown phase
+            if turn_data["betting_phase"] == "showdown":
+                return_action = {'action_name': "call"}
+
+            #bet_amount = turn_data['call_amount']
 
             # POST a request to the server
             response = player_action(PLAYER_KEY, return_action)
 
 def prob_deal(card1, card2):
-
-    winning_prob = 0
 
     num_card1 = card1[0]
     num_card2 = card2[0]
@@ -80,10 +62,7 @@ def prob_deal(card1, card2):
     suit_card1 = card1[1]
     suit_card2 = card2[1]
 
-    if abs(valuecode[num_card1] - valuecode[num_card2]) > 4:
-        return True
-    else:
-        return False 
+    return abs(valuecode[num_card1] - valuecode[num_card2]) > 4
 
 
 """
@@ -122,7 +101,7 @@ def player_action(key, json_params):
 
 def main():
     # the key is generated when we register for the tournament
-    our_key = ''
+    our_key = '3c2738d0-2e39-4376-ad0c-ad5a498ec55c'
 
     if our_key:
         poker(our_key)
