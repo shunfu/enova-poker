@@ -19,15 +19,15 @@ def poker(PLAYER_KEY):
         # Logic!
         # Check if it's your turn
         if turn_data["your_turn"]:
-            card1 = data['hand'][0]
-            card2 = data['hand'][1]
-            current_money = data['stack']
+            card1 = turn_data['hand'][0]
+            card2 = turn_data['hand'][1]
+            current_money = turn_data['stack']
             return_action = {}
 
             #deal phase
-            if data["betting_phase"] == "deal":
+            if turn_data["betting_phase"] == "deal":
 
-                bet_amount = data['call_amount']
+                bet_amount = turn_data['call_amount']
                 
                 if bet_amount == 0:
                     bet_amount == 20
@@ -37,9 +37,9 @@ def poker(PLAYER_KEY):
                 return_action = {'action_name': "bet", 'amount': bet_amount}
 
             #flop phase
-            if data["betting_phase"] == "flop":
+            if turn_data["betting_phase"] == "flop":
 
-                bet_amount = data['call_amount']
+                bet_amount = turn_data['call_amount']
                 
                 if bet_amount == 0:
                     bet_amount == 20
@@ -48,8 +48,8 @@ def poker(PLAYER_KEY):
 
                 return_action = {'action_name': "bet", 'amount': bet_amount}
             #turn phase
-            if data["betting_phase"] == "turn":
-                bet_amount = data['call_amount']
+            if turn_data["betting_phase"] == "turn":
+                bet_amount = turn_data['call_amount']
                 
                 if bet_amount == 0:
                     bet_amount == 20
@@ -59,8 +59,8 @@ def poker(PLAYER_KEY):
                 return_action = {'action_name':"bet", 'amount': bet_amount}
 
             #river phase
-            if data["betting_phase"] == "river":
-                bet_amount = data['call_amount']
+            if turn_data["betting_phase"] == "river":
+                bet_amount = turn_data['call_amount']
                 
                 if bet_amount == 0:
                     bet_amount == 20
@@ -71,12 +71,26 @@ def poker(PLAYER_KEY):
 
             # POST a request to the server
             response = player_action(PLAYER_KEY, return_action)
-            
+
+"""
+GETs are made to the following URL:
+http://nolimitcodeem.com/sandbox/players/SANDBOX_KEY
+
+POSTs are made to the following URL:
+http://nolimitcodeem.com/sandbox/players/SANDBOX_KEY/action
+
+To simulate how the game would look after the initial deal, use deal-phase-key as SANDBOX_KEY.
+To simulate how the game would look after the flop, use flop-phase-key as SANDBOX_KEY.
+To simulate how the game would look in the turn phase, use turn-phase-key as SANDBOX_KEY.
+To simulate how the game would look in the final, river phase, use river-phase-key as SANDBOX_KEY.
+"""
+
 # GET
 def game_state(key):
     # do a get request to http://nolimitcodeem.com/api/players/:key
     # get a Response object
     # return json
+    # r = requests.get('http://nolimitcodeem.com/sandbox/players/deal-phase-key')
     r = requests.get('http://nolimitcodeem.com/api/players/{}'.format(key))
     return r.json()
 
@@ -85,8 +99,8 @@ def player_action(key, json_params):
     # do a post request to http://nolimitcodeem.com/api/players/:key/action
     # get a Response object
     # return json
-    # r = requests.post(url, data=json.dumps(payload), headers=headers)
     headers = {'Content-type': 'application/json'}
+    # r = requests.post('http://nolimitcodeem.com/sandbox/players/deal-phase-key/action', 
     r = requests.post('http://nolimitcodeem.com/api/players/{}/action'.format(key), 
         data=json.dumps(json_params), 
         headers=headers)
@@ -94,7 +108,12 @@ def player_action(key, json_params):
 
 def main():
     # the key is generated when we register for the tournament
-    poker('60fd7cbe-f9e0-4ebe-a0e3-f554872a312f')
+    our_key = ''
+
+    if our_key:
+        poker(our_key)
+    else:
+        print "No key entered!"
 
 if __name__ == '__main__':
     main()
