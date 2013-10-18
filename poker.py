@@ -2,7 +2,7 @@ import requests
 import time
 import json
 
-valuecode = {'A':14,'K':13,'Q':12,'J':11, '10':10, '9':9, '8':8, '7':7, '6':6, '5':5, '4':4, '3':3, '2':2}
+valuecode = {'A':14,'K':13,'Q':12,'J':11, 'T':10, '9':9, '8':8, '7':7, '6':6, '5':5, '4':4, '3':3, '2':2}
 
 def poker(PLAYER_KEY):
     # Infinite Loop
@@ -26,49 +26,85 @@ def poker(PLAYER_KEY):
             current_money = turn_data['stack']
             return_action = {}
 
+            turn = turn_data["betting_phase"]
+
             #deal phase
-            if turn_data["betting_phase"] == "deal":
-                if prob_deal(card1, card2) or duplicates(turn_data['hand'], []):
+            if turn == "deal":
+                if turn_data["call_amount"] > turn_data["stack"]/2:
+                    return_action = {'action_name': "fold"}
+                elif ( prob_deal(card1, card2) or 
+                     duplicates(turn_data['hand'], []) or 
+                     mini_flush(turn_data['hand'], []) or 
+                     mini_straight(turn_data['hand'], []) ):
                     return_action = {'action_name': "call"}
                 else:
                     return_action = {'action_name': "fold"}
 
-            #flop phase
-            if turn_data["betting_phase"] == "flop":
-                is_flush(turn_data['hand'], turn_data['community_cards'])
+            # flop phases
+            if turn == "flop":
+                if turn_data["call_amount"] > turn_data["stack"]/1.5:
+                    return_action = {'action_name': "fold"}
+                elif ( duplicates(turn_data['hand'], turn_data['community_cards']) or 
+                    mini_flush(turn_data['hand'], turn_data['community_cards']) or 
+                    mini_straight(turn_data['hand'], turn_data['community_cards']) ):
+                    return_action = {'action_name': "call"}
+                else:
+                    return_action = {'action_name': "fold"}
 
-                return_action = {'action_name': "call"}
-
-            #turn phase
-            if turn_data["betting_phase"] == "turn":
-                return_action = {'action_name': "call"}
-
-            #river phase
-            if turn_data["betting_phase"] == "river":
-                return_action = {'action_name': "call"}
-
-            #showdown phase
-            if turn_data["betting_phase"] == "showdown":
-                return_action = {'action_name': "call"}
-
-            #bet_amount = turn_data['call_amount']
+            # other phases
+            if turn == "turn" or turn == "river" or turn == "showdown":
+                if ( duplicates(turn_data['hand'], turn_data['community_cards']) or 
+                    close_flush(turn_data['hand'], turn_data['community_cards']) or 
+                    close_straight(turn_data['hand'], turn_data['community_cards']) ):
+                    return_action = {'action_name': "call"}
+                else:
+                    return_action = {'action_name': "fold"}
 
             # POST a request to the server
             response = player_action(PLAYER_KEY, return_action)
 
-def prob_deal(card1, card2):
+            # turn_data['community_cards']
 
+def prob_deal(card1, card2):
     num_card1 = card1[0]
     num_card2 = card2[0]
-
     suit_card1 = card1[1]
     suit_card2 = card2[1]
+    return abs(valuecode[num_card1] - valuecode[num_card2]) < 5 or suit_card1 == suit_card2
 
-    return abs(valuecode[num_card1] - valuecode[num_card2]) > 4 and suit_card1 != suit_card2
+def mini_flush(our_hand, community_cards):
+    all_cards = our_hand + community_cards
+    all_suits = [card[1] for card in all_cards]
+    for x in all_suits:
+        if all_suits.count(x) > 2:
+            return True
+    return False
 
-# def is_flush(our_hand, community_cards):
+def mini_straight(our_hand, community_cards):
+    all_cards = our_hand + community_cards
+    all_nums = list(set([int(valuecode[card[0]]) for card in all_cards]))
+    all_nums.sort()
+    for i in range(len(all_nums) - 3):
+        if all_nums[i] == all_nums[i+1]-1 and all_nums[i+1] == all_nums[i+2]-1 and all_nums[i+2] == all_nums[i+3]-1:
+            return True
+    return False
 
-# def is_straight(our_hand, community_cards):
+def close_flush(our_hand, community_cards):
+    all_cards = our_hand + community_cards
+    all_suits = [card[1] for card in all_cards]
+    for x in all_suits:
+        if all_suits.count(x) > 3:
+            return True
+    return False
+
+def close_straight(our_hand, community_cards):
+    all_cards = our_hand + community_cards
+    all_nums = list(set([int(valuecode[card[0]]) for card in all_cards]))
+    all_nums.sort()
+    for i in range(len(all_nums) - 4):
+        if all_nums[i] == all_nums[i+1]-1 and all_nums[i+1] == all_nums[i+2]-1 and all_nums[i+2] == all_nums[i+3]-1 and all_nums[i+3] == all_nums[i+4]-1:
+            return True
+    return False
 
 def duplicates(our_hand, community_cards):
     all_cards = our_hand + community_cards
@@ -114,7 +150,7 @@ def player_action(key, json_params):
 
 def main():
     # the key is generated when we register for the tournament
-    our_key = 'b76f4f34-83cd-442b-94a3-f0a30df62655'
+    our_key = '11f55134-1e72-4111-9dc6-38824de1a002'
 
     if our_key:
         poker(our_key)
