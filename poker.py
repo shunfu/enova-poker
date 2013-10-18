@@ -2,6 +2,8 @@ import requests
 import time
 import json
 
+valuecode={'A':14,'K':13,'Q':12,'J':11, 10:10, 9:9, 8:8, 7:7, 6:6, 5:5, 4:4, 3:3, 2:2}
+
 def poker(PLAYER_KEY):
     # Infinite Loop
     while True:
@@ -27,14 +29,10 @@ def poker(PLAYER_KEY):
             #deal phase
             if turn_data["betting_phase"] == "deal":
 
-                bet_amount = turn_data['call_amount']
-                
-                if bet_amount == 0:
-                    bet_amount == 20
-                elif bet_amount >= current_money:
-                    bet_amount = current_money
-
-                return_action = {'action_name': "bet", 'amount': bet_amount}
+                if prob_deal(card1, card2):
+                    return_action = {'action_name': "call"}
+                else:
+                    return_action = {'action_name': "fold"}
 
             #flop phase
             if turn_data["betting_phase"] == "flop":
@@ -71,6 +69,22 @@ def poker(PLAYER_KEY):
 
             # POST a request to the server
             response = player_action(PLAYER_KEY, return_action)
+
+def prob_deal(card1, card2):
+
+    winning_prob = 0
+
+    num_card1 = card1[0]
+    num_card2 = card2[0]
+
+    suit_card1 = card1[1]
+    suit_card2 = card2[1]
+
+    if abs(valuecode[num_card1] - valuecode[num_card2]) > 4:
+        return True
+    else:
+        return False 
+
 
 """
 GETs are made to the following URL:
